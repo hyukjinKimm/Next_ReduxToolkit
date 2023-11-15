@@ -5,12 +5,23 @@ const initialState = {
   testLoading: false,
   testDone: false,
   testError: null,
+  serverSideActionLoading: false,
+  serverSideActionDone: false,
+  serverSideActionError: null,
+  serverSideActionData: "",
 }; // 초기 상태 정의
 
 export const testAction = createAsyncThunk("test/response", async (data) => {
   const response = await axios.get(`http://localhost:3065/`);
   return response.data;
 });
+export const serverSideAction = createAsyncThunk(
+  "serverSideAction/response",
+  async (data) => {
+    const response = await axios.get(`http://localhost:3065/serverSideAction`);
+    return response.data;
+  }
+);
 const testSlice = createSlice({
   name: "test",
   initialState,
@@ -33,6 +44,20 @@ const testSlice = createSlice({
       .addCase(testAction.rejected, (state, action) => {
         state.testLoading = false;
         state.testError = action.error;
+      })
+      .addCase(serverSideAction.pending, (state, action) => {
+        state.serverSideActionLoading = true;
+        state.serverSideActionDone = false;
+        state.serverSideActionError = null;
+      })
+      .addCase(serverSideAction.fulfilled, (state, action) => {
+        state.serverSideActionLoading = false;
+        state.serverSideActionDone = true;
+        state.serverSideActionData = action.payload;
+      })
+      .addCase(serverSideAction.rejected, (state, action) => {
+        state.serverSideActionLoading = false;
+        state.serverSideActionError = action.error;
       }),
 });
 

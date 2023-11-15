@@ -3,17 +3,18 @@ import { HYDRATE } from "next-redux-wrapper";
 import counter from "./counter";
 import test from "./test";
 const rootReducer = (state, action) => {
-  if (action.type === HYDRATE) {
-    return {
-      ...state,
-      ...action.payload,
-    };
+  switch (action.type) {
+    case HYDRATE:
+      console.log("HYDRATE", action);
+      return { ...action.payload };
+    default: {
+      const combinedReducer = combineReducers({
+        test,
+        counter,
+      });
+      return combinedReducer(state, action);
+    }
   }
-  return combineReducers({
-    counter,
-    test,
-    // 여기에 추가
-  })(state, action);
 };
 //cotak.tistory.com/164 [TaxFree:티스토리]
 
